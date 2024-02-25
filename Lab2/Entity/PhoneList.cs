@@ -1,8 +1,17 @@
 ﻿namespace Lab2.Entity;
 
+using System;
+using System.Diagnostics.Contracts;
+using System.Linq;
+
 public class PhoneList : Phone
 {
     private List<Contact> _contacts;
+    public List<Contact> Contacts
+    {
+        get { return _contacts; }
+        //set { _contacts = value; }
+    }
     public PhoneList()
     {
         _contacts = new List<Contact>();
@@ -10,52 +19,73 @@ public class PhoneList : Phone
 
     public override void InsertPhone(string name, string phone)
     {
-        int isExist = 0;
-        foreach (Contact contact in _contacts)
+        var contact = Contacts.Find(contact => contact.Name.Equals( name, StringComparison.OrdinalIgnoreCase));
+        if (contact != null )// có contact
         {
-            if (contact.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-            {
-                isExist = 1;
-                if (!contact.Phone.Equals(phone))
-                {
-                    _contacts.Add(new Contact(name,phone));
-                }
-            }
+            contact.AddNumber(phone);
         }
-        if (isExist == 0)
+        else
         {
-            _contacts.Add(new Contact(name,phone));
+            Console.WriteLine("here add new contact ");
+            _contacts.Add(new Contact(name, new List<string> { phone }));
+            Console.WriteLine("here add new contact ");
         }
-        
     }
 
     public override void RemovePhone(string name)
     {
-        foreach (Contact contact in _contacts)
+        var contact = Contacts.Find(contact => contact.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if (contact != null)// có contact
         {
-            if (contact.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-            {
-                _contacts.Remove(contact);
-            }
-        }
-        _contacts.Where()
+            _contacts.Remove(contact);
+        }    
+            
     }
 
     public override void UpdatePhone(string name, string newphone)
     {
-        throw new NotImplementedException();
+        var contact = Contacts.Find(contact => contact.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if (contact != null)// có contact
+        {
+            contact.NumberList = new List<string> { newphone };// ko nên
+        }    
     }
 
     public override void SearchPhone(string name)
     {
-        throw new NotImplementedException();
+        var contact = Contacts.Find(contact => contact.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        if (contact != null)// có contact
+        {
+            
+            Console.WriteLine(contact.ToString());
+        }
     }
 
     public override void Sort()
     {
-        throw new NotImplementedException();
+        _contacts.Sort(new MyCustomComparer());// sử dụng MyCustomComparer Object
+        _contacts.Sort((x, y) => x.Name.CompareTo(y.Name));// sử dụng Comparision Object hay chính là 1 Object của Deligate chính là 1 function hay lambda
+
+
+    }
+    public void PrintList()
+    {
+       foreach(var contact in _contacts)
+        {
+            Console.WriteLine(contact.ToString());
+        }
+
     }
 }
+internal class MyCustomComparer : IComparer<Contact>
+{
+    public int Compare(Contact x, Contact y)
+    {
+        // Custom comparison logic
+        return x.Name.CompareTo(y.Name);
+    }
+}
+
 // Tạo một lớp có tên Phone chứa những phương thức trừu tượng sau đây:
 // abstract void insertPhone(String name, String phone)
 //
