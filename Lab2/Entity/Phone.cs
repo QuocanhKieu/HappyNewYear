@@ -1,8 +1,8 @@
 ﻿namespace Lab2.Entity;
 
 public abstract class Phone
-{ 
-    
+{
+
     public abstract void InsertPhone(String name, String phone);
     public abstract void RemovePhone(String name);
     public abstract void UpdatePhone(String name, String newphone);
